@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criador de base PM3</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f2f5;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #1a3a5c;
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    header h1 { font-size: 1.35rem; font-weight: 600; letter-spacing: .3px; }
+    header .badge {
+      background: #fff3cd;
+      color: #856404;
+      font-size: .72rem;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    /* ── Main container ── */
+    main { max-width: 1440px; margin: 0 auto; padding: 28px 24px 60px; }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,.1);
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: .78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: #1a3a5c;
+      margin-bottom: 16px;
+    }
+
+    /* ── Form ── */
+    .form-row { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: .82rem; font-weight: 600; color: #444; }
+    input[type="date"] {
+      padding: 9px 12px;
+      border: 1.5px solid #cdd3da;
+      border-radius: 6px;
+      font-size: .9rem;
+      color: #222;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input[type="date"]:focus { border-color: #1a3a5c; }
+
+    /* ── Buttons ── */
+    .btn {
+      padding: 9px 22px;
+      border: none;
+      border-radius: 6px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, opacity .15s;
+    }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-primary  { background: #1a3a5c; color: #fff; }
+    .btn-primary:hover:not(:disabled)  { background: #22507a; }
+    .btn-success  { background: #1e7e45; color: #fff; }
+    .btn-success:hover:not(:disabled)  { background: #176038; }
+
+    /* ── Stats ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+    }
+    .stat {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px rgba(0,0,0,.08);
+      padding: 18px 20px;
+      border-top: 4px solid #1a3a5c;
+    }
+    .stat.green  { border-color: #1e7e45; }
+    .stat.red    { border-color: #c0392b; }
+    .stat.orange { border-color: #e67e22; }
+    .stat.yellow { border-color: #f0b429; }
+    .stat .num   { font-size: 2rem; font-weight: 700; color: #1a3a5c; line-height: 1.1; }
+    .stat.green  .num { color: #1e7e45; }
+    .stat.red    .num { color: #c0392b; }
+    .stat.orange .num { color: #e67e22; }
+    .stat.yellow .num { color: #b88a00; }
+    .stat .lbl   { font-size: .78rem; color: #666; margin-top: 4px; }
+
+    /* ── Toolbar (filter + export) ── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .toolbar label { font-size: .85rem; font-weight: 600; color: #444; white-space: nowrap; }
+    select#filtro-produto {
+      padding: 8px 12px;
+      border: 1.5px solid #cdd3da;
+      border-radius: 6px;
+      font-size: .88rem;
+      min-width: 280px;
+      max-width: 420px;
+      outline: none;
+    }
+    select#filtro-produto:focus { border-color: #1a3a5c; }
+    .count-badge {
+      background: #e8f0fe;
+      color: #1a3a5c;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .toolbar .spacer { flex: 1; }
+
+    /* ── Table ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid #e2e6ea;
+      max-height: 62vh;
+      overflow-y: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .82rem;
+    }
+    thead th {
+      background: #1a3a5c;
+      color: #fff;
+      font-weight: 600;
+      padding: 10px 13px;
+      text-align: left;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    tbody tr td {
+      padding: 8px 13px;
+      border-bottom: 1px solid #edf0f2;
+      white-space: nowrap;
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    tbody tr:nth-child(even) td { background: #f7f9fb; }
+    tbody tr:hover td { background: #eaf1fb !important; }
+    /* Renovação em amarelo */
+    tbody tr.alerta-renov td.col-renov {
+      background: #fff3cd !important;
+      font-weight: 600;
+      color: #856404;
+    }
+
+    /* ── Loading overlay ── */
+    #overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,.75);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    #overlay.show { display: flex; }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 5px solid #dde3ea;
+      border-top-color: #1a3a5c;
+      border-radius: 50%;
+      animation: spin .85s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #overlay p { font-size: .95rem; color: #444; font-weight: 500; }
+
+    /* ── Messages ── */
+    .msg {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+      font-size: .95rem;
+      display: none;
+    }
+    .msg.error { color: #c0392b; }
+    .msg.show  { display: block; }
+
+    /* ── Sections hidden until data loads ── */
+    #sec-stats,
+    #sec-tabela { display: none; }
+    #sec-stats.show,
+    #sec-tabela.show { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Criador de base PM3</h1>
+  <span class="badge">Base de Renovação</span>
+</header>
+
+<main>
+
+  <!-- Formulário de busca -->
+  <div class="card">
+    <div class="card-title">Período de análise</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="data_inicio">Data inicial</label>
+        <input type="date" id="data_inicio">
+      </div>
+      <div class="form-group">
+        <label for="data_fim">Data final</label>
+        <input type="date" id="data_fim">
+      </div>
+      <button class="btn btn-primary" id="btn-buscar" onclick="buscar()">Buscar</button>
+    </div>
+  </div>
+
+  <!-- Mensagens de estado -->
+  <div class="msg" id="msg-vazio">Nenhum dado encontrado para o período informado. Tente ajustar as datas.</div>
+  <div class="msg error" id="msg-erro"></div>
+
+  <!-- Stats -->
+  <div id="sec-stats">
+    <div class="stats-grid" style="margin-bottom:20px">
+      <div class="stat">
+        <div class="num" id="s-total">—</div>
+        <div class="lbl">Clientes únicos</div>
+      </div>
+      <div class="stat green">
+        <div class="num" id="s-qual">—</div>
+        <div class="lbl">Com certificado</div>
+      </div>
+      <div class="stat red">
+        <div class="num" id="s-sem">—</div>
+        <div class="lbl">Sem certificado</div>
+      </div>
+      <div class="stat orange">
+        <div class="num" id="s-30">—</div>
+        <div class="lbl">Renovações em 30 dias</div>
+      </div>
+      <div class="stat yellow">
+        <div class="num" id="s-90">—</div>
+        <div class="lbl">Renovações em 90 dias</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabela -->
+  <div id="sec-tabela">
+    <div class="card" style="padding-bottom:0">
+      <div class="card-title">Base Qualificada</div>
+
+      <div class="toolbar">
+        <label for="filtro-produto">Filtrar por produto:</label>
+        <select id="filtro-produto" onchange="filtrar()">
+          <option value="">Todos os produtos</option>
+        </select>
+        <span class="count-badge" id="count-badge">0 registros</span>
+        <div class="spacer"></div>
+        <button class="btn btn-success" id="btn-exportar" onclick="exportar()">
+          ⬇ Exportar para Excel
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Telefone</th>
+              <th>Produto que já comprou</th>
+              <th>Valor que pagou</th>
+              <th>Data da possível renovação</th>
+              <th>Qtd. certificados</th>
+              <th>Quais certificados</th>
+              <th>Emissão (cert.)</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <p style="font-size:.75rem;color:#999;padding:10px 0 14px">
+        * Células amarelas = renovação vence em até 90 dias.
+        Clientes sem certificado não aparecem nesta tabela — estão incluídos no Excel exportado.
+      </p>
+    </div>
+  </div>
+
+</main>
+
+<!-- Loading overlay -->
+<div id="overlay">
+  <div class="spinner"></div>
+  <p id="overlay-msg">Consultando banco de dados…</p>
+</div>
+
+<script>
+  // ── Chaves das colunas retornadas pelo backend ──────────────────────────────
+  const COLS = [
+    'Nome',
+    'Email',
+    'Telefone',
+    'Produto que ja comprou',
+    'Valor que pagou',
+    'Data da possivel renovacao',
+    'Quantos certificados emitidos',
+    'Quais certificados emitidos',
+    'Data de Emissao de certificado',
+  ];
+  const COL_RENOV_IDX = 5; // "Data da possivel renovacao"
+
+  let allRows = [];
+  let currentDates = {};
+
+  // ── Datas default: 1º Jan do ano corrente até hoje ─────────────────────────
+  (function setDefaultDates() {
+    const t = new Date();
+    const y = t.getFullYear();
+    const m = String(t.getMonth() + 1).padStart(2, '0');
+    const d = String(t.getDate()).padStart(2, '0');
+    document.getElementById('data_inicio').value = `${y}-01-01`;
+    document.getElementById('data_fim').value    = `${y}-${m}-${d}`;
+  })();
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function fmt(n) { return Number(n).toLocaleString('pt-BR'); }
+
+  function setOverlay(show, msg) {
+    const el = document.getElementById('overlay');
+    el.classList.toggle('show', show);
+    if (msg) document.getElementById('overlay-msg').textContent = msg;
+  }
+
+  function hideMessages() {
+    ['msg-vazio','msg-erro'].forEach(id => {
+      document.getElementById(id).classList.remove('show');
+    });
+  }
+
+  function isWithin90Days(dateStr) {
+    if (!dateStr) return false;
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return false;
+    const d = new Date(+parts[2], +parts[1] - 1, +parts[0]);
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const lim  = new Date(hoje); lim.setDate(hoje.getDate() + 90);
+    return d >= hoje && d <= lim;
+  }
+
+  // ── Renderizar tabela ──────────────────────────────────────────────────────
+  function renderTabela(rows) {
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = '';
+
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      const renovVal = row[COLS[COL_RENOV_IDX]] || '';
+      if (isWithin90Days(renovVal)) tr.classList.add('alerta-renov');
+
+      COLS.forEach((col, idx) => {
+        const td = document.createElement('td');
+        const val = row[col];
+        td.textContent = (val === null || val === undefined || val === 'nan') ? '' : val;
+        td.title = td.textContent; // tooltip para células truncadas
+        if (idx === COL_RENOV_IDX) td.classList.add('col-renov');
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('count-badge').textContent =
+      `${rows.length.toLocaleString('pt-BR')} ${rows.length === 1 ? 'registro' : 'registros'}`;
+  }
+
+  // ── Buscar ─────────────────────────────────────────────────────────────────
+  function buscar() {
+    const data_inicio = document.getElementById('data_inicio').value;
+    const data_fim    = document.getElementById('data_fim').value;
+
+    if (!data_inicio || !data_fim) { alert('Preencha as duas datas.'); return; }
+    if (data_inicio > data_fim)    { alert('A data inicial deve ser anterior à data final.'); return; }
+
+    currentDates = { data_inicio, data_fim };
+
+    hideMessages();
+    document.getElementById('sec-stats').classList.remove('show');
+    document.getElementById('sec-tabela').classList.remove('show');
+    document.getElementById('btn-buscar').disabled = true;
+    setOverlay(true, 'Consultando banco de dados…');
+
+    fetch('/buscar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data_inicio, data_fim }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      setOverlay(false);
+      document.getElementById('btn-buscar').disabled = false;
+
+      if (data.error) {
+        const el = document.getElementById('msg-erro');
+        el.textContent = 'Erro: ' + data.error;
+        el.classList.add('show');
+        return;
+      }
+
+      if (!data.registros || data.registros.length === 0) {
+        document.getElementById('msg-vazio').classList.add('show');
+        return;
+      }
+
+      // Stats
+      document.getElementById('s-total').textContent = fmt(data.total_clientes);
+      document.getElementById('s-qual').textContent  = fmt(data.total_qualificados);
+      document.getElementById('s-sem').textContent   = fmt(data.total_sem_cert);
+      document.getElementById('s-30').textContent    = fmt(data.prox30);
+      document.getElementById('s-90').textContent    = fmt(data.prox90);
+
+      // Dropdown de produtos
+      const sel = document.getElementById('filtro-produto');
+      sel.innerHTML = '<option value="">Todos os produtos</option>';
+      data.produtos.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = opt.textContent = p;
+        sel.appendChild(opt);
+      });
+
+      allRows = data.registros;
+      renderTabela(allRows);
+
+      document.getElementById('sec-stats').classList.add('show');
+      document.getElementById('sec-tabela').classList.add('show');
+    })
+    .catch(err => {
+      setOverlay(false);
+      document.getElementById('btn-buscar').disabled = false;
+      const el = document.getElementById('msg-erro');
+      el.textContent = 'Erro de conexão: ' + err;
+      el.classList.add('show');
+    });
+  }
+
+  // ── Filtrar ────────────────────────────────────────────────────────────────
+  function filtrar() {
+    const produto = document.getElementById('filtro-produto').value;
+    const filtrado = produto
+      ? allRows.filter(r => r['Produto que ja comprou'] === produto)
+      : allRows;
+    renderTabela(filtrado);
+  }
+
+  // ── Exportar ───────────────────────────────────────────────────────────────
+  function exportar() {
+    if (!currentDates.data_inicio) { alert('Faça uma busca primeiro.'); return; }
+
+    const btn = document.getElementById('btn-exportar');
+    btn.disabled = true;
+    setOverlay(true, 'Gerando arquivo Excel…');
+
+    fetch('/exportar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(currentDates),
+    })
+    .then(r => {
+      if (!r.ok) return r.json().then(j => Promise.reject(j.error || 'Erro no servidor'));
+      return r.blob();
+    })
+    .then(blob => {
+      setOverlay(false);
+      btn.disabled = false;
+      const d1  = currentDates.data_inicio.replace(/-/g, '');
+      const d2  = currentDates.data_fim.replace(/-/g, '');
+      const url = URL.createObjectURL(blob);
+      const a   = document.createElement('a');
+      a.href     = url;
+      a.download = `base_renovacao_${d1}_${d2}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    })
+    .catch(err => {
+      setOverlay(false);
+      btn.disabled = false;
+      alert('Erro ao exportar: ' + err);
+    });
+  }
+
+  // ── Enter dispara busca ────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') buscar();
+  });
+</script>
+
+</body>
+</html>
