@@ -1,0 +1,7 @@
+psycopg2-binary
+pandas
+openpyxl
+python-dotenv
+python-dateutil
+flask
+gunicorn

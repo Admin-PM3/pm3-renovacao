@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criador de base PM3</title>
+
+  <!-- PM3 Fonts: Inter Tight (headings) + Rubik (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800&family=Rubik:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ────────────────────────────────────────────────────────────
+       PM3 Design Tokens
+    ──────────────────────────────────────────────────────────── */
+    :root {
+      --deep-purple:  #452E78;
+      --royal-purple: #6645B1;
+      --yellow-glow:  #FFB12A;
+      --gray-fog:     #B9B5C1;
+      --black:        #000000;
+      --white:        #FFFFFF;
+
+      --bg:           #F5F4F8;
+      --card-bg:      #FFFFFF;
+      --text-primary: #1a1728;
+      --text-muted:   #7a7a95;
+      --border:       #e5e0f5;
+
+      --gradient-brand: linear-gradient(135deg, #452E78 0%, #6645B1 100%);
+      --gradient-blaze: linear-gradient(135deg, #4D2B9F 0%, #DACBF6 100%);
+
+      --radius-card:   12px;
+      --radius-btn:    6px;
+      --radius-pill:   999px;
+
+      --shadow-card: 0 2px 12px rgba(69, 46, 120, .09);
+      --shadow-btn:  0 4px 16px rgba(102, 69, 177, .32);
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ────────────────────────────────────────────────────────────
+       Header
+    ──────────────────────────────────────────────────────────── */
+    header {
+      background: var(--gradient-brand);
+      height: 64px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Decorative bubbles */
+    header::before,
+    header::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    header::before {
+      right: -48px; top: -48px;
+      width: 180px; height: 180px;
+      background: rgba(255,255,255,.06);
+    }
+    header::after {
+      right: 100px; top: 14px;
+      width: 72px; height: 72px;
+      background: rgba(255,255,255,.04);
+    }
+
+    .hd-logo img {
+      height: 30px;
+      filter: brightness(0) invert(1);
+      display: block;
+    }
+    .hd-divider {
+      width: 1px;
+      height: 28px;
+      background: rgba(255,255,255,.22);
+      flex-shrink: 0;
+    }
+    .hd-title {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: .15px;
+    }
+    .hd-badge {
+      background: var(--yellow-glow);
+      color: var(--black);
+      font-family: 'Inter Tight', sans-serif;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+    }
+
+    /* ────────────────────────────────────────────────────────────
+       Layout
+    ──────────────────────────────────────────────────────────── */
+    main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px 24px 72px;
+    }
+
+    /* ────────────────────────────────────────────────────────────
+       Card
+    ──────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: var(--royal-purple);
+      margin-bottom: 18px;
+    }
+
+    /* ────────────────────────────────────────────────────────────
+       Form
+    ──────────────────────────────────────────────────────────── */
+    .form-row  { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+    .form-group label {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: .8rem;
+      font-weight: 600;
+      color: #3d3858;
+    }
+
+    input[type="date"] {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-btn);
+      font-family: 'Rubik', sans-serif;
+      font-size: .875rem;
+      color: var(--text-primary);
+      background: #faf9fd;
+      outline: none;
+      transition: border-color .18s, box-shadow .18s;
+    }
+    input[type="date"]:focus {
+      border-color: var(--royal-purple);
+      box-shadow: 0 0 0 3px rgba(102, 69, 177, .12);
+    }
+
+    /* ────────────────────────────────────────────────────────────
+       Buttons
+    ──────────────────────────────────────────────────────────── */
+    .btn {
+      font-family: 'Inter Tight', sans-serif;
+      padding: 10px 24px;
+      border: none;
+      border-radius: var(--radius-btn);
+      font-size: .875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: box-shadow .18s, opacity .18s, background .18s;
+      white-space: nowrap;
+    }
+    .btn:disabled { opacity: .44; cursor: not-allowed; }
+
+    /* Primary — Royal Purple gradient */
+    .btn-primary {
+      background: var(--gradient-brand);
+      color: var(--white);
+    }
+    .btn-primary:hover:not(:disabled) {
+      box-shadow: var(--shadow-btn);
+    }
+
+    /* Export — Yellow Glow */
+    .btn-export {
+      background: var(--yellow-glow);
+      color: var(--black);
+      font-weight: 700;
+    }
+    .btn-export:hover:not(:disabled) {
+      background: #e6a020;
+      box-shadow: 0 4px 14px rgba(255, 177, 42, .38);
+    }
+
+    /* ────────────────────────────────────────────────────────────
+       Stats grid
+    ──────────────────────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 20px 22px;
+      border-top: 4px solid var(--deep-purple);
+      position: relative;
+      overflow: hidden;
+    }
+    .stat::after {
+      content: '';
+      position: absolute;
+      bottom: -24px; right: -18px;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: rgba(69, 46, 120, .05);
+      pointer-events: none;
+    }
+
+    .stat.s-purple { border-top-color: var(--deep-purple); }
+    .stat.s-green  { border-top-color: #2e7d5e; }
+    .stat.s-fog    { border-top-color: var(--gray-fog); }
+    .stat.s-yellow { border-top-color: var(--yellow-glow); }
+    .stat.s-violet { border-top-color: var(--royal-purple); }
+
+    .stat .num {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 5px;
+      color: var(--deep-purple);
+    }
+    .stat.s-green  .num { color: #2e7d5e; }
+    .stat.s-fog    .num { color: #8e8ea8; }
+    .stat.s-yellow .num { color: #b07500; }
+    .stat.s-violet .num { color: var(--royal-purple); }
+
+    .stat .lbl {
+      font-family: 'Rubik', sans-serif;
+      font-size: .77rem;
+      color: var(--text-muted);
+    }
+
+    /* ────────────────────────────────────────────────────────────
+       Toolbar (filtros + export)
+    ──────────────────────────────────────────────────────────── */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .toolbar label {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: .8rem;
+      font-weight: 600;
+      color: #3d3858;
+      white-space: nowrap;
+    }
+
+    .toolbar select {
+      padding: 8px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-btn);
+      font-family: 'Rubik', sans-serif;
+      font-size: .845rem;
+      color: var(--text-primary);
+      background: #faf9fd;
+      min-width: 200px;
+      max-width: 340px;
+      outline: none;
+      cursor: pointer;
+      transition: border-color .18s;
+    }
+    .toolbar select:focus { border-color: var(--royal-purple); }
+
+    .count-badge {
+      display: inline-block;
+      background: rgba(102, 69, 177, .1);
+      color: var(--royal-purple);
+      font-family: 'Inter Tight', sans-serif;
+      font-size: .74rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+    }
+    .toolbar .spacer { flex: 1 1 auto; }
+
+    /* ────────────────────────────────────────────────────────────
+       Table
+    ──────────────────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 60vh;
+      border-radius: 8px;
+      border: 1px solid #ede8f9;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .81rem;
+    }
+
+    thead th {
+      background: var(--gradient-brand);
+      color: var(--white);
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 600;
+      font-size: .79rem;
+      letter-spacing: .2px;
+      padding: 11px 14px;
+      text-align: left;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    tbody tr td {
+      font-family: 'Rubik', sans-serif;
+      padding: 9px 14px;
+      border-bottom: 1px solid #f2eefb;
+      white-space: nowrap;
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #2a2540;
+    }
+    tbody tr:nth-child(even) td { background: #faf9fd; }
+    tbody tr:hover td { background: #f0ebfb !important; }
+
+    /* Renovação em amarelo (Yellow Glow tint) */
+    tbody tr.alerta-renov td.col-renov {
+      background: rgba(255, 177, 42, .18) !important;
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 700;
+      color: #7a4c00;
+    }
+
+    /* ── Badges: Tipo de cliente ── */
+    .badge-tipo {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      font-family: 'Inter Tight', sans-serif;
+      font-size: .71rem;
+      font-weight: 700;
+      letter-spacing: .2px;
+      white-space: nowrap;
+    }
+    /* Assinatura ativa → Yellow Glow */
+    .badge-assinatura {
+      background: rgba(255, 177, 42, .18);
+      color: #7a4c00;
+    }
+    /* Já renovou → Royal Purple */
+    .badge-renovou {
+      background: rgba(102, 69, 177, .12);
+      color: var(--deep-purple);
+    }
+    /* Elegível → Deep Purple light */
+    .badge-elegivel {
+      background: rgba(69, 46, 120, .08);
+      color: var(--royal-purple);
+    }
+    /* Sem engajamento → Gray */
+    .badge-sem {
+      background: rgba(185, 181, 193, .22);
+      color: #5e5e78;
+    }
+
+    .table-note {
+      font-family: 'Rubik', sans-serif;
+      font-size: .72rem;
+      color: #aba8be;
+      padding: 10px 0 14px;
+    }
+
+    /* ────────────────────────────────────────────────────────────
+       State messages
+    ──────────────────────────────────────────────────────────── */
+    .msg {
+      text-align: center;
+      padding: 48px 24px;
+      font-family: 'Rubik', sans-serif;
+      font-size: .95rem;
+      color: var(--text-muted);
+      display: none;
+    }
+    .msg.error { color: #a02020; }
+    .msg.show  { display: block; }
+
+    /* ────────────────────────────────────────────────────────────
+       Sections visibility
+    ──────────────────────────────────────────────────────────── */
+    #sec-stats,
+    #sec-tabela { display: none; }
+    #sec-stats.show,
+    #sec-tabela.show { display: block; }
+
+    /* ────────────────────────────────────────────────────────────
+       Loading overlay
+    ──────────────────────────────────────────────────────────── */
+    #overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(245, 244, 248, .84);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    #overlay.show { display: flex; }
+
+    .spinner {
+      width: 48px; height: 48px;
+      border: 4px solid rgba(69, 46, 120, .14);
+      border-top-color: var(--royal-purple);
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #overlay p {
+      font-family: 'Inter Tight', sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--deep-purple);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <div class="hd-logo">
+    <img src="https://pm3.com.br/wp-content/uploads/2025/03/logo-pm3.svg" alt="PM3" height="28">
+  </div>
+  <div class="hd-divider"></div>
+  <span class="hd-title">Criador de base</span>
+  <span class="hd-badge">Renovação</span>
+</header>
+
+<main>
+
+  <!-- ── Formulário ── -->
+  <div class="card">
+    <div class="card-title">Período de análise</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="data_inicio">Data inicial</label>
+        <input type="date" id="data_inicio">
+      </div>
+      <div class="form-group">
+        <label for="data_fim">Data final</label>
+        <input type="date" id="data_fim">
+      </div>
+      <button class="btn btn-primary" id="btn-buscar" onclick="buscar()">Buscar</button>
+    </div>
+  </div>
+
+  <!-- ── Mensagens de estado ── -->
+  <div class="msg" id="msg-vazio">Nenhum dado encontrado para o período informado. Tente ajustar as datas.</div>
+  <div class="msg error" id="msg-erro"></div>
+
+  <!-- ── Stats ── -->
+  <div id="sec-stats">
+    <div class="stats-grid">
+      <div class="stat s-purple">
+        <div class="num" id="s-total">—</div>
+        <div class="lbl">Clientes únicos</div>
+      </div>
+      <div class="stat s-green">
+        <div class="num" id="s-qual">—</div>
+        <div class="lbl">Com certificado</div>
+      </div>
+      <div class="stat s-fog">
+        <div class="num" id="s-sem">—</div>
+        <div class="lbl">Sem certificado</div>
+      </div>
+      <div class="stat s-yellow">
+        <div class="num" id="s-30">—</div>
+        <div class="lbl">Renovações em 30 dias</div>
+      </div>
+      <div class="stat s-violet">
+        <div class="num" id="s-90">—</div>
+        <div class="lbl">Renovações em 90 dias</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Tabela ── -->
+  <div id="sec-tabela">
+    <div class="card" style="padding-bottom:0">
+      <div class="card-title">Base Qualificada</div>
+
+      <div class="toolbar">
+        <label for="filtro-produto">Produto:</label>
+        <select id="filtro-produto" onchange="filtrar()">
+          <option value="">Todos</option>
+        </select>
+        <label for="filtro-tipo">Tipo de cliente:</label>
+        <select id="filtro-tipo" onchange="filtrar()">
+          <option value="">Todos</option>
+        </select>
+        <span class="count-badge" id="count-badge">0 registros</span>
+        <div class="spacer"></div>
+        <button class="btn btn-export" id="btn-exportar" onclick="exportar()">
+          ⬇ Exportar para Excel
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Telefone</th>
+              <th>Produto que já comprou</th>
+              <th>Valor que pagou</th>
+              <th>Data da possível renovação</th>
+              <th>Qtd. certificados</th>
+              <th>Quais certificados</th>
+              <th>Emissão (cert.)</th>
+              <th>Última compra</th>
+              <th>Dias desde compra</th>
+              <th>Dias desde cert.</th>
+              <th>Tipo de cliente</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <p class="table-note">
+        * Células em amarelo = renovação vence em até 90 dias.
+        Clientes sem certificado não aparecem aqui — estão incluídos no Excel exportado.
+      </p>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Loading overlay ── -->
+<div id="overlay">
+  <div class="spinner"></div>
+  <p id="overlay-msg">Consultando banco de dados…</p>
+</div>
+
+<script>
+  // ── Chaves das colunas retornadas pelo backend ──────────────────────────────
+  const COLS = [
+    'Nome',
+    'Email',
+    'Telefone',
+    'Produto que ja comprou',
+    'Valor que pagou',
+    'Data da possivel renovacao',
+    'Quantos certificados emitidos',
+    'Quais certificados emitidos',
+    'Data de Emissao de certificado',
+    // novas colunas
+    'Ultima compra (geral)',
+    'Dias desde ultima compra',
+    'Dias desde ultimo certificado',
+    'Tipo de cliente',
+  ];
+  const COL_RENOV_IDX = 5;  // "Data da possivel renovacao"
+  const COL_TIPO_IDX  = 12; // "Tipo de cliente"
+
+  let allRows = [];
+  let currentDates = {};
+
+  // ── Datas default: 1º Jan do ano corrente até hoje ─────────────────────────
+  (function setDefaultDates() {
+    const t = new Date();
+    const y = t.getFullYear();
+    const m = String(t.getMonth() + 1).padStart(2, '0');
+    const d = String(t.getDate()).padStart(2, '0');
+    document.getElementById('data_inicio').value = `${y}-01-01`;
+    document.getElementById('data_fim').value    = `${y}-${m}-${d}`;
+  })();
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function fmt(n) { return Number(n).toLocaleString('pt-BR'); }
+
+  function tipoClass(tipo) {
+    if (tipo === 'Assinatura ativa')        return 'badge-assinatura';
+    if (tipo === 'Ja renovou')              return 'badge-renovou';
+    if (tipo === 'Elegivel para renovacao') return 'badge-elegivel';
+    return 'badge-sem';
+  }
+
+  function setOverlay(show, msg) {
+    const el = document.getElementById('overlay');
+    el.classList.toggle('show', show);
+    if (msg) document.getElementById('overlay-msg').textContent = msg;
+  }
+
+  function hideMessages() {
+    ['msg-vazio','msg-erro'].forEach(id => {
+      document.getElementById(id).classList.remove('show');
+    });
+  }
+
+  function isWithin90Days(dateStr) {
+    if (!dateStr) return false;
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return false;
+    const d = new Date(+parts[2], +parts[1] - 1, +parts[0]);
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const lim  = new Date(hoje); lim.setDate(hoje.getDate() + 90);
+    return d >= hoje && d <= lim;
+  }
+
+  // ── Renderizar tabela ──────────────────────────────────────────────────────
+  function renderTabela(rows) {
+    const tbody = document.getElementById('tbody');
+    tbody.innerHTML = '';
+
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      const renovVal = row[COLS[COL_RENOV_IDX]] || '';
+      if (isWithin90Days(renovVal)) tr.classList.add('alerta-renov');
+
+      COLS.forEach((col, idx) => {
+        const td  = document.createElement('td');
+        const val = row[col];
+        const txt = (val === null || val === undefined || val === 'nan') ? '' : String(val);
+
+        if (idx === COL_TIPO_IDX && txt) {
+          // Renderizar badge colorido para Tipo de cliente
+          const badge = document.createElement('span');
+          badge.textContent = txt;
+          badge.className   = 'badge-tipo ' + tipoClass(txt);
+          td.appendChild(badge);
+        } else {
+          td.textContent = txt;
+        }
+
+        td.title = txt; // tooltip para células truncadas
+        if (idx === COL_RENOV_IDX) td.classList.add('col-renov');
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('count-badge').textContent =
+      `${rows.length.toLocaleString('pt-BR')} ${rows.length === 1 ? 'registro' : 'registros'}`;
+  }
+
+  // ── Buscar ─────────────────────────────────────────────────────────────────
+  function buscar() {
+    const data_inicio = document.getElementById('data_inicio').value;
+    const data_fim    = document.getElementById('data_fim').value;
+
+    if (!data_inicio || !data_fim) { alert('Preencha as duas datas.'); return; }
+    if (data_inicio > data_fim)    { alert('A data inicial deve ser anterior à data final.'); return; }
+
+    currentDates = { data_inicio, data_fim };
+
+    hideMessages();
+    document.getElementById('sec-stats').classList.remove('show');
+    document.getElementById('sec-tabela').classList.remove('show');
+    document.getElementById('btn-buscar').disabled = true;
+    setOverlay(true, 'Consultando banco de dados…');
+
+    fetch('/buscar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data_inicio, data_fim }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      setOverlay(false);
+      document.getElementById('btn-buscar').disabled = false;
+
+      if (data.error) {
+        const el = document.getElementById('msg-erro');
+        el.textContent = 'Erro: ' + data.error;
+        el.classList.add('show');
+        return;
+      }
+
+      if (!data.registros || data.registros.length === 0) {
+        document.getElementById('msg-vazio').classList.add('show');
+        return;
+      }
+
+      // Stats
+      document.getElementById('s-total').textContent = fmt(data.total_clientes);
+      document.getElementById('s-qual').textContent  = fmt(data.total_qualificados);
+      document.getElementById('s-sem').textContent   = fmt(data.total_sem_cert);
+      document.getElementById('s-30').textContent    = fmt(data.prox30);
+      document.getElementById('s-90').textContent    = fmt(data.prox90);
+
+      // Dropdown de produtos
+      const sel = document.getElementById('filtro-produto');
+      sel.innerHTML = '<option value="">Todos</option>';
+      data.produtos.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = opt.textContent = p;
+        sel.appendChild(opt);
+      });
+
+      // Dropdown de tipo de cliente
+      const selTipo = document.getElementById('filtro-tipo');
+      selTipo.innerHTML = '<option value="">Todos</option>';
+      (data.tipos || []).forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = opt.textContent = t;
+        selTipo.appendChild(opt);
+      });
+
+      allRows = data.registros;
+      renderTabela(allRows);
+
+      document.getElementById('sec-stats').classList.add('show');
+      document.getElementById('sec-tabela').classList.add('show');
+    })
+    .catch(err => {
+      setOverlay(false);
+      document.getElementById('btn-buscar').disabled = false;
+      const el = document.getElementById('msg-erro');
+      el.textContent = 'Erro de conexão: ' + err;
+      el.classList.add('show');
+    });
+  }
+
+  // ── Filtrar ────────────────────────────────────────────────────────────────
+  function filtrar() {
+    const produto = document.getElementById('filtro-produto').value;
+    const tipo    = document.getElementById('filtro-tipo').value;
+    const filtrado = allRows.filter(r => {
+      const okProduto = !produto || r['Produto que ja comprou'] === produto;
+      const okTipo    = !tipo    || r['Tipo de cliente'] === tipo;
+      return okProduto && okTipo;
+    });
+    renderTabela(filtrado);
+  }
+
+  // ── Exportar ───────────────────────────────────────────────────────────────
+  function exportar() {
+    if (!currentDates.data_inicio) { alert('Faça uma busca primeiro.'); return; }
+
+    const btn = document.getElementById('btn-exportar');
+    btn.disabled = true;
+    setOverlay(true, 'Gerando arquivo Excel…');
+
+    fetch('/exportar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(currentDates),
+    })
+    .then(r => {
+      if (!r.ok) return r.json().then(j => Promise.reject(j.error || 'Erro no servidor'));
+      return r.blob();
+    })
+    .then(blob => {
+      setOverlay(false);
+      btn.disabled = false;
+      const d1  = currentDates.data_inicio.replace(/-/g, '');
+      const d2  = currentDates.data_fim.replace(/-/g, '');
+      const url = URL.createObjectURL(blob);
+      const a   = document.createElement('a');
+      a.href     = url;
+      a.download = `base_renovacao_${d1}_${d2}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    })
+    .catch(err => {
+      setOverlay(false);
+      btn.disabled = false;
+      alert('Erro ao exportar: ' + err);
+    });
+  }
+
+  // ── Enter dispara busca ────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') buscar();
+  });
+</script>
+
+</body>
+</html>
