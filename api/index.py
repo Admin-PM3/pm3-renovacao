@@ -1,15 +1,14 @@
 """
 api/index.py - Vercel Serverless entrypoint
-Importa o Flask app do diretório raiz.
-A Vercel detecta automaticamente apps WSGI/Flask — sem app.run(), sem host, sem porta.
+
+Para WSGI (Flask), a Vercel espera apenas a variável 'app'.
+NÃO usar 'handler' — o runtime interpreta como BaseHTTPRequestHandler e quebra.
 """
 import sys
 import os
 
-# Adiciona o diretório raiz ao path para que app.py e gerar_base.py sejam encontrados
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Adiciona o diretório raiz ao path (app.py, gerar_base.py, templates/)
+_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, _root)
 
-from app import app  # noqa: F401  (Vercel detecta via nome 'app')
-
-# 'handler' é o alias para compatibilidade com runtimes que procuram essa variável
-handler = app
+from app import app  # 'app' é a variável que a Vercel detecta como WSGI
