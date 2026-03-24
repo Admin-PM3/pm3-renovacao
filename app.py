@@ -1,7 +1,7 @@
 """
 app.py - Interface web do Criador de base PM3
 Chama a logica ja existente em gerar_base.py.
-Pronto para deploy no Railway (host 0.0.0.0, PORT via env var).
+Compatível com Railway (host 0.0.0.0, PORT via env var) e Vercel (via api/index.py).
 """
 
 import os
@@ -123,22 +123,34 @@ def buscar():
 @app.route('/exportar', methods=['POST'])
 def exportar():
     body = request.get_json(force=True, silent=True) or {}
-    data_inicio = body.get('data_inicio', '').strip()
-    data_fim    = body.get('data_fim', '').strip()
+    data_inicio      = body.get('data_inicio', '').strip()
+    data_fim         = body.get('data_fim', '').strip()
+    produtos_filtro  = body.get('produtos', [])   # lista de produtos selecionados (pode ser vazia)
 
     erro = _validar_datas(data_inicio, data_fim)
     if erro:
         return jsonify({'error': erro}), 400
 
     try:
-        logger.info(f"Exportacao XLSX iniciada: {data_inicio} a {data_fim}")
+        logger.info(f"Exportacao XLSX iniciada: {data_inicio} a {data_fim} | filtro produtos: {produtos_filtro or 'todos'}")
         from gerar_base import run_pipeline, build_xlsx_bytes
         df_qual, df_sem, df_recente, prox30, prox90 = run_pipeline(data_inicio, data_fim)
-        xlsx = build_xlsx_bytes(df_qual, df_sem, df_recente, prox30, prox90, data_inicio, data_fim)
+
+        # Aplicar filtro de produtos se informado
+        if produtos_filtro:
+            df_qual_exp = df_qual[df_qual['Produto que ja comprou'].isin(produtos_filtro)].copy()
+            df_sem_exp  = df_sem[df_sem['Produto que ja comprou'].isin(produtos_filtro)].copy()
+            logger.info(f"Filtro aplicado: {len(df_qual_exp)} qualificados, {len(df_sem_exp)} sem cert")
+        else:
+            df_qual_exp = df_qual
+            df_sem_exp  = df_sem
+
+        xlsx = build_xlsx_bytes(df_qual_exp, df_sem_exp, df_recente, prox30, prox90, data_inicio, data_fim)
 
         d1 = data_inicio.replace('-', '')
         d2 = data_fim.replace('-', '')
-        filename = f"base_renovacao_{d1}_{d2}.xlsx"
+        sufixo   = f"_filtrado" if produtos_filtro else ""
+        filename = f"base_renovacao_{d1}_{d2}{sufixo}.xlsx"
 
         logger.info(f"Exportacao XLSX concluida: {filename}")
         return send_file(
