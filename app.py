@@ -79,12 +79,12 @@ def buscar():
                             'total_qualificados': 0, 'total_sem_cert': 0,
                             'prox30': 0, 'prox90': 0, 'produtos': []})
 
-        # Serializar para JSON (NaN → "")
+        # Serializar para JSON — normaliza todos os valores vazios/nulos para ""
         registros = (
             df_qual
             .fillna('')
             .astype(str)
-            .replace({'nan': '', '<NA>': ''})
+            .replace({'nan': '', 'NaN': '', 'None': '', '<NA>': '', 'NaT': ''})
             .to_dict(orient='records')
         )
         # Converter "Quantos certificados emitidos" de volta para int quando possível

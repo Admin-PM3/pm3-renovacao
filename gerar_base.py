@@ -33,9 +33,12 @@ STATUS_SUCESSO = ("succeeded", "authorized")
 # ─── Conexões ────────────────────────────────────────────────────────────────
 
 def conectar_pagamentos():
+    port = os.getenv("DB_PAYMENTS_PORT")
+    if port is None:
+        raise ValueError("Variável de ambiente DB_PAYMENTS_PORT não configurada.")
     return psycopg2.connect(
         host=os.getenv("DB_PAYMENTS_HOST"),
-        port=int(os.getenv("DB_PAYMENTS_PORT")),
+        port=int(port),
         dbname=os.getenv("DB_PAYMENTS_DB"),
         user=os.getenv("DB_PAYMENTS_USER"),
         password=os.getenv("DB_PAYMENTS_PASSWORD"),
@@ -44,9 +47,12 @@ def conectar_pagamentos():
     )
 
 def conectar_certificados():
+    port = os.getenv("DB_CERTS_PORT")
+    if port is None:
+        raise ValueError("Variável de ambiente DB_CERTS_PORT não configurada.")
     return psycopg2.connect(
         host=os.getenv("DB_CERTS_HOST"),
-        port=int(os.getenv("DB_CERTS_PORT")),
+        port=int(port),
         dbname=os.getenv("DB_CERTS_DB"),
         user=os.getenv("DB_CERTS_USER"),
         password=os.getenv("DB_CERTS_PASSWORD"),
